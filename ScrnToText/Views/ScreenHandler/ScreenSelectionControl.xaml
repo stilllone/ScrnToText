@@ -1,0 +1,17 @@
+﻿<Window x:Class="ScrnToText.Views.ScreenHandler.ScreenSelectionControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScrnToText.Views.ScreenHandler" xmlns:viewmodels="clr-namespace:ScrnToText.ViewModels"
+        mc:Ignorable="d"
+        Title="ScreenSelectionControl" ResizeMode="NoResize" ShowInTaskbar="False">
+    
+    <Canvas x:Name="canvas"
+        MouseMove="Canvas_MouseMove"
+        MouseDown="Canvas_MouseDown"
+        MouseUp="Canvas_MouseUp"
+        >
+        <Image Source="{Binding Screenshot}"/>
+    </Canvas>
+</Window>
