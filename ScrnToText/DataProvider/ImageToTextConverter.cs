@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,18 +10,16 @@ namespace ScrnToText.DataProvider
 {
     public class ImageToTextConverter
     {
-        public string GetTextFromImage()
+        public string GetTextFromImage(Bitmap bitmap, string currLang)
         {
-            using (var engine = new TesseractEngine(@"path_to_lang", "eng", EngineMode.Default))
+            using (TesseractEngine? engine = new TesseractEngine(@"", currLang, EngineMode.Default))
             {
-                using (var img = Pix.LoadFromFile(@"path_to_image"))//need to update to screen and selection
+                using (Page? page = engine.Process(PixConverter.ToPix(bitmap), PageSegMode.Auto))
                 {
-                    using (var page = engine.Process(img))
-                    {
-                        return page.GetText();
-                    }
+                    return page.GetText();
                 }
             }
+            return default;
         }
     }
 }

@@ -13,6 +13,9 @@ using System.Windows;
 using Point = System.Drawing.Point;
 using System.Windows.Media.Imaging;
 using System.IO;
+using ScrnToText.DataProvider;
+using ScrnToText.Interface;
+using ScrnToText.Helpers;
 
 namespace ScrnToText.ViewModels
 {
@@ -30,12 +33,19 @@ namespace ScrnToText.ViewModels
         private ObservableCollection<INavigationControl> _navigationFooter = new();
 
         [ObservableProperty]
-        private ObservableCollection<Wpf.Ui.Controls.MenuItem> _trayMenuItems = new();
+        private ObservableCollection<MenuItem> _trayMenuItems = new();
 
-        public MainWindowViewModel(INavigationService navigationService)
+        [ObservableProperty]
+        private string _textFromTesseract;
+
+        [ObservableProperty]
+        private ILanguageService _languageService;
+
+        public MainWindowViewModel(INavigationService navigationService, ILanguageService languageService)
         {
             if (!_isInitialized)
                 InitializeViewModel();
+            LanguageService = languageService;
         }
 
         private void InitializeViewModel()
@@ -64,9 +74,9 @@ namespace ScrnToText.ViewModels
                 }
             };
 
-            TrayMenuItems = new ObservableCollection<Wpf.Ui.Controls.MenuItem>
+            TrayMenuItems = new ObservableCollection<MenuItem>
             {
-                new Wpf.Ui.Controls.MenuItem
+                new MenuItem
                 {
                     Header = "Home",
                     Tag = "tray_home"
@@ -102,47 +112,18 @@ namespace ScrnToText.ViewModels
                 {
                     graphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
                 }
-                ScreenSelectionControl selectionForm = new(ConvertToBitmapImage(bitmap));
-                    selectionForm.ShowDialog();
+                ConvertToBitmapImage convertToBitmapImage = new();
+                ScreenSelectionControl selectionForm = new(convertToBitmapImage.ConvertToBitmap(bitmap));
+                selectionForm.ShowDialog();
                 Rect selectedArea = selectionForm.SelectedArea;
 
-                if (selectedArea != new Rect(0,0,0,0))
+                if (selectedArea != new Rect(0, 0, 0, 0))
                 {
-                    // Save screenshot
-                    System.Windows.Forms.Clipboard.SetImage(bitmap.Clone(ConvertRectToRectangle(selectedArea), bitmap.PixelFormat));
+                    // Image to text
+                    ImageToTextConverter imageToTextConverter = new();
+                    TextFromTesseract = imageToTextConverter.GetTextFromImage(bitmap, LanguageService.GetCurrentLanguage());
                 }
             }
-        }
-
-        private BitmapImage ConvertToBitmapImage(Bitmap bitmap)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                // Save the bitmap to a memory stream
-                bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Bmp);
-                memoryStream.Position = 0;
-
-                // Create a new BitmapImage
-                BitmapImage bitmapImage = new BitmapImage();
-
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memoryStream;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-
-                return bitmapImage;
-            }
-        }
-
-        private Rectangle ConvertRectToRectangle(Rect rect)
-        {
-            int x = (int)rect.X;
-            int y = (int)rect.Y;
-            int width = (int)rect.Width;
-            int height = (int)rect.Height;
-
-            return new Rectangle(x, y, width, height);
         }
     }
 }

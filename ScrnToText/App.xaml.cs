@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ScrnToText.Interface;
 using ScrnToText.Models;
 using ScrnToText.Services;
 using System.IO;
@@ -51,6 +52,9 @@ namespace ScrnToText
                 services.AddScoped<ViewModels.DashboardViewModel>();
                 services.AddScoped<Views.Pages.SettingsPage>();
                 services.AddScoped<ViewModels.SettingsViewModel>();
+
+                // Language service
+                services.AddScoped<ILanguageService, LanguageService>();
 
                 // Configuration
                 services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));

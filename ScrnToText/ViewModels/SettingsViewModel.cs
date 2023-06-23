@@ -1,13 +1,36 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ScrnToText.Helpers;
+using ScrnToText.Interface;
 using System;
-using System.Windows.Input;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Documents;
 using Wpf.Ui.Common.Interfaces;
 
 namespace ScrnToText.ViewModels
 {
     public partial class SettingsViewModel : ObservableObject, INavigationAware
     {
+
+        private string language;
+        public string Language 
+        { 
+            get
+            { 
+                return language; 
+            } 
+            set 
+            {  
+                language = value;
+                LanguageService.SetLanguage(language);
+                OnPropertyChanged(nameof(Language));
+            } 
+        }
+
+        [ObservableProperty]
+        private List<string> _supportedLanguages;
+
         private bool _isInitialized = false;
 
         [ObservableProperty]
@@ -15,6 +38,15 @@ namespace ScrnToText.ViewModels
 
         [ObservableProperty]
         private Wpf.Ui.Appearance.ThemeType _currentTheme = Wpf.Ui.Appearance.ThemeType.Unknown;
+
+        [ObservableProperty]
+        private ILanguageService _languageService;
+
+        public SettingsViewModel(ILanguageService languageService)
+        {
+            LanguageService = languageService;
+            SupportedLanguages = Enum.GetValues(typeof(LangEnum)).Cast<LangEnum>().Select(v => v.ToString()).ToList();
+        }
 
         public void OnNavigatedTo()
         {

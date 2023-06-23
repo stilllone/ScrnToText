@@ -6,7 +6,7 @@
     xmlns:helpers="clr-namespace:ScrnToText.Helpers"
     xmlns:local="clr-namespace:ScrnToText.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:viewmodels="clr-namespace:ScrnToText.ViewModels"
     Title="SettingsPage"
     d:DataContext="{d:DesignInstance local:SettingsPage,
                                      IsDesignTimeCreatable=False}"
@@ -46,5 +46,6 @@
             FontWeight="Medium"
             Text="About ScrnToText" />
         <TextBlock Margin="0,12,0,0" Text="{Binding ViewModel.AppVersion, Mode=OneWay}" />
+        <ComboBox SelectedItem="{Binding ViewModel.Language}" ItemsSource="{Binding ViewModel.SupportedLanguages}"/>
     </StackPanel>
 </ui:UiPage>
