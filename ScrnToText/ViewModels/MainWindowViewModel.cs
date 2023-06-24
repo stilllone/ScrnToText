@@ -94,7 +94,7 @@ namespace ScrnToText.ViewModels
             foreach (Screen screen in Screen.AllScreens)
             {
                 bounds = Rectangle.Union(bounds, screen.Bounds);
-                // If monitors with a different diagonal 
+                // When monitors with a different diagonal 
                 if (screen.Bounds.Height > maxHeight)
                 {
                     maxHeight = screen.Bounds.Height;
@@ -121,7 +121,9 @@ namespace ScrnToText.ViewModels
                 {
                     // Image to text
                     ImageToTextConverter imageToTextConverter = new();
-                    TextFromTesseract = imageToTextConverter.GetTextFromImage(bitmap, LanguageService.GetCurrentLanguage());
+                    GetDataToTesseract getDataToTesseract = new();
+                    getDataToTesseract.GetCurrentLangData(LanguageService.GetCurrentLanguage(), out string dataPath, out string shortLang);
+                    TextFromTesseract = imageToTextConverter.GetTextFromImage(bitmap, dataPath, shortLang);
                 }
             }
         }
