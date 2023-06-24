@@ -16,6 +16,8 @@ using System.IO;
 using ScrnToText.DataProvider;
 using ScrnToText.Interface;
 using ScrnToText.Helpers;
+using System.Diagnostics;
+using Clipboard = System.Windows.Clipboard;
 
 namespace ScrnToText.ViewModels
 {
@@ -122,8 +124,11 @@ namespace ScrnToText.ViewModels
                     // Image to text
                     ImageToTextConverter imageToTextConverter = new();
                     GetDataToTesseract getDataToTesseract = new();
+                    SelectAreaFromBitmap selectAreaFromBitmap = new();
+                    Bitmap selectedBitmap = selectAreaFromBitmap.SelectAreaByRect(bitmap, selectedArea);
                     getDataToTesseract.GetCurrentLangData(LanguageService.GetCurrentLanguage(), out string dataPath, out string shortLang);
-                    TextFromTesseract = imageToTextConverter.GetTextFromImage(bitmap, dataPath, shortLang);
+                    TextFromTesseract = imageToTextConverter.GetTextFromImage(selectedBitmap , dataPath, shortLang);
+                    Clipboard.SetText(TextFromTesseract);
                 }
             }
         }

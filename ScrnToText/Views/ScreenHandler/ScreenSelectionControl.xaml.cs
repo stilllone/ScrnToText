@@ -10,7 +10,7 @@ using Brush = System.Windows.Media.Brush;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Shapes;
-
+using System.ComponentModel;
 
 namespace ScrnToText.Views.ScreenHandler
 {
@@ -40,7 +40,7 @@ namespace ScrnToText.Views.ScreenHandler
             ConfigureForm();
             DataContext = this;
             InitializeComponent();
-            
+            Closing += OnClosing;
         }
 
         private void ConfigureForm()
@@ -51,7 +51,7 @@ namespace ScrnToText.Views.ScreenHandler
             Height = SystemParameters.VirtualScreenHeight;
         }
 
-        private void OnClosing()
+        private void OnClosing(object sender, CancelEventArgs e)
         {
             SelectionClosed?.Invoke(this, _selectedArea);
         }
