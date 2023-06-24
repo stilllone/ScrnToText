@@ -10,15 +10,15 @@ namespace ScrnToText.DataProvider
             {
                 case nameof(LangEnum.English):
                     dataPath = @"./tessdata";
-                    shortLang = currLang.Substring(0, 3).ToLower();
+                    shortLang = "eng";
                     break;
                 case nameof(LangEnum.Ukrainian):
-                    dataPath = "/tessdata/ukr.traineddata";
-                    shortLang = dataPath.Split('/')[2].Split('.')[0];
+                    dataPath = @"./tessdata";
+                    shortLang = "ukr";
                     break;
                 case nameof(LangEnum.German):
-                    dataPath = "/tessdata/deu.traineddata";
-                    shortLang = dataPath.Split('/')[2].Split('.')[0];
+                    dataPath = @"./tessdata";
+                    shortLang = "deu";
                     break;
                 default:
                     dataPath = default;
