@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ScrnToText.Views.ScreenHandler" xmlns:viewmodels="clr-namespace:ScrnToText.ViewModels"
         mc:Ignorable="d"
-        Title="ScreenSelectionControl" ResizeMode="NoResize" ShowInTaskbar="False">
+        ResizeMode="NoResize" WindowStyle="None" ShowInTaskbar="False">
     
     <Canvas x:Name="canvas"
         MouseMove="Canvas_MouseMove"

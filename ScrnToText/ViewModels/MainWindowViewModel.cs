@@ -9,15 +9,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using CommunityToolkit.Mvvm.Input;
 using ScrnToText.Views.ScreenHandler;
-using System.Windows;
-using Point = System.Drawing.Point;
-using System.Windows.Media.Imaging;
-using System.IO;
-using ScrnToText.DataProvider;
 using ScrnToText.Interface;
 using ScrnToText.Helpers;
-using System.Diagnostics;
-using Clipboard = System.Windows.Clipboard;
 
 namespace ScrnToText.ViewModels
 {
@@ -102,34 +95,9 @@ namespace ScrnToText.ViewModels
                     maxHeight = screen.Bounds.Height;
                 }
             }
-            GetScreenshot(bounds, maxHeight);
-        }
-
-        private void GetScreenshot(Rectangle bounds, int maxHeight)
-        {
-            // Create a image with size that user specifies
-            using (Bitmap bitmap = new(bounds.Width, maxHeight))
+            using (var screenshotHelper = new ScreenshotHelper())
             {
-                using (Graphics graphics = Graphics.FromImage(bitmap))
-                {
-                    graphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
-                }
-                ConvertToBitmapImage convertToBitmapImage = new();
-                ScreenSelectionControl selectionForm = new(convertToBitmapImage.ConvertToBitmap(bitmap));
-                selectionForm.ShowDialog();
-                Rect selectedArea = selectionForm.SelectedArea;
-
-                if (selectedArea != new Rect(0, 0, 0, 0))
-                {
-                    // Image to text
-                    ImageToTextConverter imageToTextConverter = new();
-                    GetDataToTesseract getDataToTesseract = new();
-                    SelectAreaFromBitmap selectAreaFromBitmap = new();
-                    Bitmap selectedBitmap = selectAreaFromBitmap.SelectAreaByRect(bitmap, selectedArea);
-                    getDataToTesseract.GetCurrentLangData(LanguageService.GetCurrentLanguage(), out string dataPath, out string shortLang);
-                    TextFromTesseract = imageToTextConverter.GetTextFromImage(selectedBitmap , dataPath, shortLang);
-                    Clipboard.SetText(TextFromTesseract);
-                }
+                TextFromTesseract = screenshotHelper.GetScreenshot(bounds, maxHeight, LanguageService.GetCurrentLanguage());
             }
         }
     }
