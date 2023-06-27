@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Imaging;
 
 namespace ScrnToText.Helpers
 {
-    public class SelectAreaFromBitmap
+    public class SelectAreaFromBitmap : IDisposable
     {
+        private Bitmap? selectedBitmap;
+        private bool disposed = false;
         public Bitmap SelectAreaByRect(Bitmap sourceBitmap, Rect rect)
         {
             Rectangle drawingRect = new Rectangle((int)rect.Left, (int)rect.Top, (int)rect.Width, (int)rect.Height);
-            Bitmap selectedBitmap = new Bitmap(drawingRect.Width, drawingRect.Height);
+            selectedBitmap = new Bitmap(drawingRect.Width, drawingRect.Height);
 
             using (Graphics graphics = Graphics.FromImage(selectedBitmap))
             {
@@ -23,6 +20,25 @@ namespace ScrnToText.Helpers
             }
 
             return selectedBitmap;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    selectedBitmap?.Dispose();
+                }
+
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

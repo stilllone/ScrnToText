@@ -13,7 +13,7 @@ namespace ScrnToText.Views.ScreenHandler
 {
     public partial class ScreenSelectionControl : Window, IDisposable
     {
-        public event EventHandler<Rect> SelectionClosed;
+        private event EventHandler<Rect> SelectionClosed;
         private Point _startPoint;
 
         private Rectangle rect;
@@ -52,7 +52,6 @@ namespace ScrnToText.Views.ScreenHandler
         private void OnClosing(object sender, CancelEventArgs e)
         {
             SelectionClosed?.Invoke(this, _selectedArea);
-            this.Dispose();
         }
 
         private void Canvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -102,7 +101,9 @@ namespace ScrnToText.Views.ScreenHandler
 
         public void Dispose()
         {
+            GC.Collect();
             GC.SuppressFinalize(this);
+            GC.WaitForPendingFinalizers();
         }
     }
 }

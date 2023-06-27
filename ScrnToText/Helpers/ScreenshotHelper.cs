@@ -9,12 +9,14 @@ namespace ScrnToText.Helpers
 {
     public class ScreenshotHelper : IDisposable
     {
-        private Bitmap bitmap;
-        private ScreenSelectionControl selectionForm;
-        private Bitmap selectedBitmap;
-        private ImageToTextConverter imageToTextConverter = new();
-        private GetDataToTesseract getDataToTesseract = new();
-        private SelectAreaFromBitmap selectAreaFromBitmap = new();
+        private Bitmap? bitmap;
+        private Bitmap? selectedBitmap;
+        private readonly ImageToTextConverter imageToTextConverter = new();
+        private readonly GetDataToTesseract getDataToTesseract = new();
+        private readonly SelectAreaFromBitmap selectAreaFromBitmap = new();
+        private readonly ConvertToBitmapImage convertToBitmapImage = new();
+        private Rect selectedArea;
+        private bool disposed = false;
 
         public string? GetScreenshot(Rectangle bounds, int maxHeight, string currentLanguage)
         {
@@ -24,29 +26,43 @@ namespace ScrnToText.Helpers
             using (Graphics graphics = Graphics.FromImage(bitmap))
             {
                 graphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
-            }
+                using (ScreenSelectionControl selectionForm = new (convertToBitmapImage.ConvertToBitmap(bitmap)))
+                {
+                    selectionForm.ShowDialog();
+                    selectionForm.Dispose();
 
-            ConvertToBitmapImage convertToBitmapImage = new ConvertToBitmapImage();
-            selectionForm = new ScreenSelectionControl(convertToBitmapImage.ConvertToBitmap(bitmap));
-            selectionForm.ShowDialog();
-            Rect selectedArea = selectionForm.SelectedArea;
-
-            if (selectedArea != new Rect(0, 0, 0, 0))
-            {
-                // Image to text
-                selectedBitmap = selectAreaFromBitmap.SelectAreaByRect(bitmap, selectedArea);
-                getDataToTesseract.GetCurrentLangData(currentLanguage, out string dataPath, out string shortLang);
-                return imageToTextConverter.GetTextFromImage(selectedBitmap, dataPath, shortLang);
+                    selectedArea = selectionForm.SelectedArea;
+                    if (selectedArea != new Rect(0, 0, 0, 0))
+                    {
+                        // Image to text
+                        selectedBitmap = selectAreaFromBitmap.SelectAreaByRect(bitmap, selectedArea);
+                        getDataToTesseract.GetCurrentLangData(currentLanguage, out string dataPath, out string shortLang);
+                        return imageToTextConverter.GetTextFromImage(selectedBitmap, dataPath, shortLang);
+                    }
+                }
             }
             return default;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    bitmap?.Dispose();
+                    selectedBitmap?.Dispose();
+                    selectedArea = Rect.Empty;
+                }
+
+                disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            bitmap?.Dispose();
-            selectionForm?.Dispose();
-            selectedBitmap?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
-
 }

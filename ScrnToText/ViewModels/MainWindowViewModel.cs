@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 using ScrnToText.Views.ScreenHandler;
 using ScrnToText.Interface;
 using ScrnToText.Helpers;
+using System.Linq;
 
 namespace ScrnToText.ViewModels
 {
@@ -84,19 +85,11 @@ namespace ScrnToText.ViewModels
         [RelayCommand]
         private void OnCapture()
         {
-            int maxHeight = 0;
-            Rectangle bounds = new();
-            foreach (Screen screen in Screen.AllScreens)
-            {
-                bounds = Rectangle.Union(bounds, screen.Bounds);
-                // When monitors with a different diagonal 
-                if (screen.Bounds.Height > maxHeight)
-                {
-                    maxHeight = screen.Bounds.Height;
-                }
-            }
             using (var screenshotHelper = new ScreenshotHelper())
             {
+                Screen[]? screens = Screen.AllScreens;
+                Rectangle bounds = screens.Select(screen => screen.Bounds).Aggregate(Rectangle.Union);
+                int maxHeight = screens.Max(screen => screen.Bounds.Height);
                 TextFromTesseract = screenshotHelper.GetScreenshot(bounds, maxHeight, LanguageService.GetCurrentLanguage());
             }
         }
